@@ -1,0 +1,12 @@
+D:\Hobby\#repos\online-checkers\OnlineCheckers\Shared\bin\Debug\net6.0\OnlineCheckers.Shared.deps.json
+D:\Hobby\#repos\online-checkers\OnlineCheckers\Shared\bin\Debug\net6.0\OnlineCheckers.Shared.dll
+D:\Hobby\#repos\online-checkers\OnlineCheckers\Shared\bin\Debug\net6.0\OnlineCheckers.Shared.pdb
+D:\Hobby\#repos\online-checkers\OnlineCheckers\Shared\obj\Debug\net6.0\OnlineCheckers.Shared.csproj.AssemblyReference.cache
+D:\Hobby\#repos\online-checkers\OnlineCheckers\Shared\obj\Debug\net6.0\OnlineCheckers.Shared.GeneratedMSBuildEditorConfig.editorconfig
+D:\Hobby\#repos\online-checkers\OnlineCheckers\Shared\obj\Debug\net6.0\OnlineCheckers.Shared.AssemblyInfoInputs.cache
+D:\Hobby\#repos\online-checkers\OnlineCheckers\Shared\obj\Debug\net6.0\OnlineCheckers.Shared.AssemblyInfo.cs
+D:\Hobby\#repos\online-checkers\OnlineCheckers\Shared\obj\Debug\net6.0\OnlineCheckers.Shared.csproj.CoreCompileInputs.cache
+D:\Hobby\#repos\online-checkers\OnlineCheckers\Shared\obj\Debug\net6.0\OnlineCheckers.Shared.dll
+D:\Hobby\#repos\online-checkers\OnlineCheckers\Shared\obj\Debug\net6.0\refint\OnlineCheckers.Shared.dll
+D:\Hobby\#repos\online-checkers\OnlineCheckers\Shared\obj\Debug\net6.0\OnlineCheckers.Shared.pdb
+D:\Hobby\#repos\online-checkers\OnlineCheckers\Shared\obj\Debug\net6.0\ref\OnlineCheckers.Shared.dll

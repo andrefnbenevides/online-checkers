@@ -1,0 +1,105 @@
+﻿@using OnlineCheckers.Client.Data
+@for (int i = 0; i < boardSize; i++)
+{
+    int auxI = i;
+    <div class="row">
+        @for (int j = 0; j < boardSize; j++)
+        {
+            int auxJ = j;
+            var checker = blackCheckers.FirstOrDefault(n => n.Column == j && n.Row == i);
+            if (checker == null) checker = whiteCheckers.FirstOrDefault(n => n.Column == j && n.Row == i);
+            
+            bool isPossibleMove = rowPossibilities.Contains(i) && columnPossibilities.Contains(j);
+
+            <div class="cell @(isPossibleMove ? "active" : "")" @onclick="() => { MoveChecker(auxI, auxJ); }">
+                @if (checker != null)
+                {
+                    <div class="checker @checker.Color @(checker == activeChecker ? "active" : "")" @onclick="()=> { SetActiveChecker(checker); EvaluatePossibleMoves(); }"></div>
+                }
+            </div>
+        }
+    </div>
+}
+
+@code {
+    int boardSize = 8;
+    List<Checker> blackCheckers = new List<Checker>();
+    List<Checker> whiteCheckers = new List<Checker>();
+    Checker activeChecker = null;
+
+    List<int> rowPossibilities = new List<int>();
+    List<int> columnPossibilities = new List<int>();
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        GeneratePieces();
+
+    }
+    protected void SetActiveChecker(Checker checker)
+    {
+        activeChecker = checker;
+    }
+
+    protected void EvaluatePossibleMoves()
+    {
+        ClearPossibilities();
+
+        if(activeChecker != null)
+        {
+            int directionMultiplier = activeChecker.Diretion == CheckerDirection.Down ? 1 : -1;
+            rowPossibilities.Add(activeChecker.Row + (1 * directionMultiplier));
+
+            columnPossibilities.Add(activeChecker.Column - 1);
+            columnPossibilities.Add(activeChecker.Column + 1);
+        }
+    }
+    protected void ClearPossibilities()
+    {    
+        rowPossibilities.Clear();
+        columnPossibilities.Clear();
+    }
+
+    void MoveChecker(int row, int column)
+    {
+        bool isPossibleMove = rowPossibilities.Contains(row) && columnPossibilities.Contains(column);
+        if (!isPossibleMove) return;
+
+        activeChecker.Column = column;
+        activeChecker.Row = row;
+        activeChecker = null;
+        ClearPossibilities();
+    }
+
+    protected void GeneratePieces()
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            for (int j = (i + 1) % 2; j < 8; j+=2)
+            {
+                blackCheckers.Add(new Checker()
+                    {
+                        Column = j,
+                        Row = i,
+                        Diretion = CheckerDirection.Down,
+                        Color = "black"
+                    });
+            }
+        }
+        
+        for (int i = 5; i < 8; i++)
+        {
+            for (int j = (i + 1) % 2; j < 8; j+=2)
+            {
+                blackCheckers.Add(new Checker()
+                    {
+                        Column = j,
+                        Row = i,
+                        Diretion = CheckerDirection.Up,
+                        Color = "white"
+                    });
+            }
+        }
+        
+    }
+}
