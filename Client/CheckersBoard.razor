@@ -14,7 +14,7 @@
             <div class="cell @(isPossibleMove ? "active" : "")" @onclick="() => { MoveChecker(auxI, auxJ); }">
                 @if (checker != null)
                 {
-                    <div class="checker @checker.Color @(checker == activeChecker ? "active" : "")" @onclick="()=> { SetActiveChecker(checker); GeneratePossibleMoves(); }">
+                    <div class="checker @checker.Color @(checker == activeChecker ? "active" : "")" @onclick="()=> { CheckerPieceClicked(checker); }">
                         <div>@(checker.Diretion == CheckerDirection.Both ? "♕" : "")</div>
                     </div>
                 }
@@ -24,6 +24,7 @@
 }
 
 @code {
+    bool isWhiteTurn = true;
     List<Checker> blackCheckers = new List<Checker>();
     List<Checker> whiteCheckers = new List<Checker>();
     Checker activeChecker = null;
@@ -36,6 +37,13 @@
         GeneratePieces();
 
     }
+
+    protected void CheckerPieceClicked(Checker checker)
+    {
+        SetActiveChecker(checker); 
+        GeneratePossibleMoves();    
+    }
+
     protected void SetActiveChecker(Checker checker)
     {
         activeChecker = checker;
