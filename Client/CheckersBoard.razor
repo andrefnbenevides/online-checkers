@@ -77,19 +77,34 @@
 
             foreach (int row in rowPossibilities)
             {
-                if(IsMoveLegal(row, activeChecker.Column - 1)) movePossibilities.Add((row, activeChecker.Column - 1));
-                if(IsMoveLegal(row, activeChecker.Column + 1)) movePossibilities.Add((row, activeChecker.Column + 1));
+                EvaluateMove(row, activeChecker.Column - 1);
+                EvaluateMove(row, activeChecker.Column + 1);
             }
         }
     }
 
-    protected bool IsMoveLegal(int row, int column)
+    protected void EvaluateMove(int row, int column, bool isFirstTime = true)
     {
         var blackChecker = blackCheckers.FirstOrDefault(n => n.Row == row && n.Column == column);
+        var whiteChecker = whiteCheckers.FirstOrDefault(n => n.Row == row && n.Column == column);
 
-        var whiteChecker = blackCheckers.FirstOrDefault(n => n.Row == row && n.Column == column);
+        if(whiteChecker ==  null && blackChecker == null)
+        {
+            movePossibilities.Add((row, column));
+        }
+        else if(isFirstTime)
+        {
+            //Evaluating jump over possibility
+            if((isWhiteTurn && blackChecker != null) ||
+            (!isWhiteTurn && whiteChecker != null))
+            {
+                int columnGap = column - activeChecker.Column;
 
-        return whiteChecker == null && blackChecker == null;
+                int rowGap = row - activeChecker.Row;
+
+                EvaluateMove(row + rowGap, column + columnGap, false);
+            }
+        }
 
     }
 
@@ -103,17 +118,48 @@
         bool isPossibleMove = movePossibilities.Contains((row, column));
         if (!isPossibleMove) return;
 
-        activeChecker.Column = column;
-        activeChecker.Row = row;
         if((activeChecker.Row == 0 && activeChecker.Color == Constants.WHITE_CHECKER_COLOR_NAME) || 
         (activeChecker.Row == (Constants.BOARD_SIZE - 1) && activeChecker.Color == Constants.BLACK_CHECKER_COLOR_NAME))
         {
             activeChecker.Diretion = CheckerDirection.Both;
         }
-        activeChecker = null;
 
+        CheckForCheckerTaken(row, column);
+
+        activeChecker.Column = column;
+        activeChecker.Row = row;
+
+        activeChecker = null;
         ClearPossibilities();
         ChangeTurn();
+    }
+
+    protected void CheckForCheckerTaken(int row, int column)
+    {
+        Console.WriteLine("Evaluating if checker was taken");
+
+        if(Math.Abs(activeChecker.Column - column) == 2)
+        {
+            int jumpedColumn = (activeChecker.Column + column) / 2;
+            int jumpedRow = (activeChecker.Row + row) / 2;
+
+            Checker? takenChecker = null;
+            if (isWhiteTurn)
+            {
+                takenChecker = blackCheckers.FirstOrDefault(n => n.Column == jumpedColumn && n.Row == jumpedRow);
+                if (takenChecker != null) blackCheckers.Remove(takenChecker);
+            }
+            else
+            {
+                takenChecker = whiteCheckers.FirstOrDefault(n => n.Column == jumpedColumn && n.Row == jumpedRow);
+                foreach (var whiteChecker in whiteCheckers)
+                {
+                    Console.WriteLine(whiteChecker.Row + "  | " + whiteChecker.Column);
+                }
+                if (takenChecker != null) whiteCheckers.Remove(takenChecker);
+                
+            }
+        }
     }
 
     protected void ChangeTurn()
@@ -141,7 +187,7 @@
         {
             for (int j = (i + 1) % 2; j < Constants.BOARD_SIZE; j+=2)
             {
-                blackCheckers.Add(new Checker()
+                whiteCheckers.Add(new Checker()
                     {
                         Column = j,
                         Row = i,
