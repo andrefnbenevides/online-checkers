@@ -1,9 +1,12 @@
 ﻿@using OnlineCheckers.Client.Data
-@for (int i = 0; i < boardSize; i++)
+<div>
+    @(isWhiteTurn? "Whites' turn" : "Blacks' turn")
+</div>
+@for (int i = 0; i < Constants.BOARD_SIZE; i++)
 {
     int auxI = i;
     <div class="row">
-        @for (int j = 0; j < boardSize; j++)
+        @for (int j = 0; j < Constants.BOARD_SIZE; j++)
         {
             int auxJ = j;
             var checker = blackCheckers.FirstOrDefault(n => n.Column == j && n.Row == i);
@@ -14,7 +17,7 @@
             <div class="cell @(isPossibleMove ? "active" : "")" @onclick="() => { MoveChecker(auxI, auxJ); }">
                 @if (checker != null)
                 {
-                    <div class="checker @checker.Color @(checker == activeChecker ? "active" : "")" @onclick="()=> { SetActiveChecker(checker); GeneratePossibleMoves(); }">
+                    <div class="checker @checker.Color @(checker == activeChecker ? "active" : "")" @onclick="()=> { CheckerPieceClicked(checker); }">
                         <div>@(checker.Diretion == CheckerDirection.Both ? "♕" : "")</div>
                     </div>
                 }
@@ -24,7 +27,7 @@
 }
 
 @code {
-    int boardSize = 8;
+    bool isWhiteTurn = true;
     List<Checker> blackCheckers = new List<Checker>();
     List<Checker> whiteCheckers = new List<Checker>();
     Checker activeChecker = null;
@@ -37,6 +40,18 @@
         GeneratePieces();
 
     }
+
+    protected void CheckerPieceClicked(Checker checker)
+    {
+        if (isWhiteTurn && checker.Color == Constants.BLACK_CHECKER_COLOR_NAME)
+            return;
+        if (!isWhiteTurn && checker.Color == Constants.WHITE_CHECKER_COLOR_NAME)
+            return;
+
+        SetActiveChecker(checker); 
+        GeneratePossibleMoves();    
+    }
+
     protected void SetActiveChecker(Checker checker)
     {
         activeChecker = checker;
@@ -91,20 +106,26 @@
         activeChecker.Column = column;
         activeChecker.Row = row;
         if((activeChecker.Row == 0 && activeChecker.Color == Constants.WHITE_CHECKER_COLOR_NAME) || 
-        (activeChecker.Row == 7 && activeChecker.Color == Constants.BLACK_CHECKER_COLOR_NAME))
+        (activeChecker.Row == (Constants.BOARD_SIZE - 1) && activeChecker.Color == Constants.BLACK_CHECKER_COLOR_NAME))
         {
             activeChecker.Diretion = CheckerDirection.Both;
         }
         activeChecker = null;
 
         ClearPossibilities();
+        ChangeTurn();
+    }
+
+    protected void ChangeTurn()
+    {
+        isWhiteTurn = !isWhiteTurn;
     }
 
     protected void GeneratePieces()
     {
         for (int i = 0; i < 3; i++)
         {
-            for (int j = (i + 1) % 2; j < 8; j+=2)
+            for (int j = (i + 1) % 2; j < Constants.BOARD_SIZE; j+=2)
             {
                 blackCheckers.Add(new Checker()
                     {
@@ -118,7 +139,7 @@
         
         for (int i = 5; i < 8; i++)
         {
-            for (int j = (i + 1) % 2; j < 8; j+=2)
+            for (int j = (i + 1) % 2; j < Constants.BOARD_SIZE; j+=2)
             {
                 blackCheckers.Add(new Checker()
                     {
