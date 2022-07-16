@@ -1,9 +1,9 @@
 ﻿@using OnlineCheckers.Client.Data
-@for (int i = 0; i < boardSize; i++)
+@for (int i = 0; i < Constants.BOARD_SIZE; i++)
 {
     int auxI = i;
     <div class="row">
-        @for (int j = 0; j < boardSize; j++)
+        @for (int j = 0; j < Constants.BOARD_SIZE; j++)
         {
             int auxJ = j;
             var checker = blackCheckers.FirstOrDefault(n => n.Column == j && n.Row == i);
@@ -24,7 +24,6 @@
 }
 
 @code {
-    int boardSize = 8;
     List<Checker> blackCheckers = new List<Checker>();
     List<Checker> whiteCheckers = new List<Checker>();
     Checker activeChecker = null;
@@ -75,7 +74,7 @@
         var whiteChecker = blackCheckers.FirstOrDefault(n => n.Row == row && n.Column == column);
 
         return whiteChecker == null && blackChecker == null;
-
+        
     }
 
     protected void ClearPossibilities()
@@ -91,7 +90,7 @@
         activeChecker.Column = column;
         activeChecker.Row = row;
         if((activeChecker.Row == 0 && activeChecker.Color == Constants.WHITE_CHECKER_COLOR_NAME) || 
-        (activeChecker.Row == 7 && activeChecker.Color == Constants.BLACK_CHECKER_COLOR_NAME))
+        (activeChecker.Row == (Constants.BOARD_SIZE - 1) && activeChecker.Color == Constants.BLACK_CHECKER_COLOR_NAME))
         {
             activeChecker.Diretion = CheckerDirection.Both;
         }
@@ -104,7 +103,7 @@
     {
         for (int i = 0; i < 3; i++)
         {
-            for (int j = (i + 1) % 2; j < 8; j+=2)
+            for (int j = (i + 1) % 2; j < Constants.BOARD_SIZE; j+=2)
             {
                 blackCheckers.Add(new Checker()
                     {
@@ -118,7 +117,7 @@
         
         for (int i = 5; i < 8; i++)
         {
-            for (int j = (i + 1) % 2; j < 8; j+=2)
+            for (int j = (i + 1) % 2; j < Constants.BOARD_SIZE; j+=2)
             {
                 blackCheckers.Add(new Checker()
                     {
