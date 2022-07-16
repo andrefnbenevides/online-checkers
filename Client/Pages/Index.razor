@@ -1,3 +1,61 @@
 ﻿@page "/"
+@inject NavigationManager NavigationManager
+@using Microsoft.AspNetCore.SignalR.Client
+@using OnlineCheckers.Shared
 
-<CheckersBoard />
+@if (inGame)
+{
+    <CheckersBoard HubConnection="@hubConnection" GameId="@gameId" IsWhitePlayer="@isWhitePlayer"/>
+}
+else
+{
+    <button @onclick="CreateGame">Create Game</button>
+
+    @foreach (string gameId in availableGames)
+    {
+        <button @onclick="() => { JoinGame(gameId); }">Join game @gameId</button>
+    }
+}
+
+@code{
+    private HubConnection? hubConnection;
+    List<string> availableGames = new List<string>();
+    bool inGame = false;
+    string gameId = "";
+    bool isWhitePlayer = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(NavigationManager.ToAbsoluteUri(SharedConstants.MULTIPLAYER_HUB_PATTERN_CONNECT).ToString())
+            .Build();
+
+        await FetchAvailableGames();
+    }
+
+    async Task FetchAvailableGames()
+    {
+        HttpClient client = new HttpClient();
+        availableGames = await client.GetFromJsonAsync<List<string>>(NavigationManager.ToAbsoluteUri(SharedConstants.API_ENDPOINT_GET_AVAILABLE_GAMES).ToString());
+        if (availableGames == null) availableGames = new List<string>();
+    }
+
+    async Task CreateGame()
+    {
+
+        await hubConnection.StartAsync();
+        gameId = Guid.NewGuid().ToString();
+        await hubConnection.SendAsync(SharedConstants.MULTIPLAYER_HUB_METHOD_JOIN_GAME, gameId);
+        inGame = true;
+    }
+
+    async Task JoinGame(string gameId)
+    {
+        isWhitePlayer = false;
+        await hubConnection.StartAsync();
+        this.gameId = gameId;
+        await hubConnection.SendAsync(SharedConstants.MULTIPLAYER_HUB_METHOD_JOIN_GAME, gameId);
+
+        inGame = true;
+    }
+}
