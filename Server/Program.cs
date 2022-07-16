@@ -1,11 +1,15 @@
 using Microsoft.AspNetCore.ResponseCompression;
+using OnlineCheckers.Server.Data;
+using OnlineCheckers.Server.Hubs;
+using OnlineCheckers.Shared;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
+builder.Services.AddSignalR();
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
+builder.Services.AddSingleton<GameManager>();
 
 var app = builder.Build();
 
@@ -31,6 +35,7 @@ app.UseRouting();
 
 app.MapRazorPages();
 app.MapControllers();
+app.MapHub<MultiplayerHub>(SharedConstants.MULTIPLAYER_HUB_PATTERN_CONNECT);
 app.MapFallbackToFile("index.html");
 
 app.Run();

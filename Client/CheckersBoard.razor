@@ -1,4 +1,6 @@
-﻿@using OnlineCheckers.Client.Data
+﻿@using Microsoft.AspNetCore.SignalR.Client
+@using OnlineCheckers.Client.Data
+@using OnlineCheckers.Shared
 <div>
     @(isWhiteTurn? "Whites' turn" : "Blacks' turn")
 </div>
@@ -27,6 +29,10 @@
 }
 
 @code {
+    [Parameter] public string GameId { get; set; }
+    [Parameter] public HubConnection HubConnection { get; set; }
+    [Parameter] public bool IsWhitePlayer{ get; set; }
+
     bool isWhiteTurn = true;
     List<Checker> blackCheckers = new List<Checker>();
     List<Checker> whiteCheckers = new List<Checker>();
@@ -39,10 +45,43 @@
         base.OnInitialized();
         GeneratePieces();
 
+        HubConnection.On(SharedConstants.MULTIPLAYER_HUB_GAME_JOINED, () =>
+        {
+            Console.WriteLine("User has joined the game");
+        });
+
+        HubConnection.On<int, int, int, int>(SharedConstants.MULTIPLAYER_HUB_CHECKER_MOVED, OpponentMove);
+    }
+
+    protected void OpponentMove(int prevCol, int prevRow, int currCol, int currRow)
+    {
+        Console.WriteLine("Black checkers");
+        foreach (var item in blackCheckers)
+        {
+
+            Console.WriteLine($"Black row={item.Row} col={item.Column}");
+        }
+
+        Console.WriteLine("White checkers");
+        foreach (var item in whiteCheckers)
+        {
+
+            Console.WriteLine($"White row={item.Row} col={item.Column}");
+        }
+        var checker = blackCheckers.FirstOrDefault(n => n.Column == prevCol && n.Row == prevRow);
+        if(checker == null) checker = whiteCheckers.FirstOrDefault(n => n.Column == prevCol && n.Row == prevRow);
+
+        Console.WriteLine($"Opponent moved his checker from c:{prevCol} r:{prevRow} to c:{currCol} r:{currRow}");
+        Console.WriteLine($"Checker is {(checker == null ? "" : "NOT")} NULL");
+        SetActiveChecker(checker);
+        GeneratePossibleMoves();
+        MoveChecker(currRow, currCol);
     }
 
     protected void CheckerPieceClicked(Checker checker)
     {
+        if (isWhiteTurn != IsWhitePlayer) 
+            return;
         if (isWhiteTurn && checker.Color == Constants.BLACK_CHECKER_COLOR_NAME)
             return;
         if (!isWhiteTurn && checker.Color == Constants.WHITE_CHECKER_COLOR_NAME)
@@ -115,23 +154,36 @@
 
     void MoveChecker(int row, int column)
     {
+        Console.WriteLine($"MoveChecker called. row={row} col={column}");
+        Console.WriteLine("Possible moves");
+        foreach (var item in movePossibilities)
+        {
+            
+            Console.WriteLine($"Possibility: row={item.row} col={item.column}");
+        }
         bool isPossibleMove = movePossibilities.Contains((row, column));
+        Console.WriteLine("IsPossibleMove = " + isPossibleMove);
+        
         if (!isPossibleMove) return;
 
+        CheckForCheckerTaken(row, column);
+        Console.WriteLine("Check for checker taken done.");
+
+        HubConnection.SendAsync(SharedConstants.MULTIPLAYER_HUB_METHOD_MOVE_CHECKER, GameId, activeChecker.Column, activeChecker.Row, column, row);
+        activeChecker.Column = column;
+        activeChecker.Row = row;
+        
         if((activeChecker.Row == 0 && activeChecker.Color == Constants.WHITE_CHECKER_COLOR_NAME) || 
         (activeChecker.Row == (Constants.BOARD_SIZE - 1) && activeChecker.Color == Constants.BLACK_CHECKER_COLOR_NAME))
         {
             activeChecker.Diretion = CheckerDirection.Both;
+            Console.WriteLine("Changed direction to both");
         }
 
-        CheckForCheckerTaken(row, column);
-
-        activeChecker.Column = column;
-        activeChecker.Row = row;
-
         activeChecker = null;
-        ClearPossibilities();
         ChangeTurn();
+        GeneratePossibleMoves();
+        StateHasChanged();
     }
 
     protected void CheckForCheckerTaken(int row, int column)
