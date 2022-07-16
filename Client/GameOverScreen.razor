@@ -1,0 +1,24 @@
+﻿@inject NavigationManager NavigationManager;
+
+@if (IsPlayerVictorius)
+{
+    <div class="center">
+        WINNER WINNER CHECKERS DINNER
+    </div>
+}
+else
+{
+    <div class="center">
+        GAME OVER
+    </div>
+}
+<button @onclick="() => { GoBackToLobby(); }">Go back to lobby</button>
+
+@code {
+    [Parameter] public bool IsPlayerVictorius { get; set; }
+
+    protected void GoBackToLobby()
+    {
+        NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
+    }
+}

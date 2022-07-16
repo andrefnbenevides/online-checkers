@@ -1,35 +1,44 @@
 ﻿@using Microsoft.AspNetCore.SignalR.Client
 @using OnlineCheckers.Client.Data
 @using OnlineCheckers.Shared
-<div>
-    @(isWhiteTurn? "Whites' turn" : "Blacks' turn")
-</div>
-@for (int i = 0; i < Constants.BOARD_SIZE; i++)
-{
-    int auxI = i;
-    <div class="row">
-        @for (int j = 0; j < Constants.BOARD_SIZE; j++)
-        {
-            int auxJ = j;
-            var checker = blackCheckers.FirstOrDefault(n => n.Column == j && n.Row == i);
-            if (checker == null) checker = whiteCheckers.FirstOrDefault(n => n.Column == j && n.Row == i);
-            
-            bool isPossibleMove = movePossibilities.Contains((auxI, auxJ));
 
-            <div class="cell" @onclick="() => { MoveChecker(auxI, auxJ); }">
-                @if (checker != null)
-                {
-                    <div class="checker @checker.Color @(checker == activeChecker ? "active" : "")" @onclick="()=> { CheckerPieceClicked(checker); }">
-                        <div class="center">@(checker.Diretion == CheckerDirection.Both ? "♕" : "")</div>
-                    </div>
-                }
-                @if (isPossibleMove)
-                {
-                    <div class="center target-move">🎯</div>
-                }
-            </div>
-        }
+@if (!IsGameOver())
+{
+    <div>
+        @(isWhiteTurn? "Whites' turn" : "Blacks' turn")
     </div>
+    @for (int i = 0; i < Constants.BOARD_SIZE; i++)
+    {
+        int auxI = i;
+        <div class="row">
+            @for (int j = 0; j < Constants.BOARD_SIZE; j++)
+            {
+                int auxJ = j;
+                var checker = blackCheckers.FirstOrDefault(n => n.Column == j && n.Row == i);
+                if (checker == null) checker = whiteCheckers.FirstOrDefault(n => n.Column == j && n.Row == i);
+            
+                bool isPossibleMove = movePossibilities.Contains((auxI, auxJ));
+
+                <div class="cell" @onclick="() => { MoveChecker(auxI, auxJ); }">
+                    @if (checker != null)
+                    {
+                        <div class="checker @checker.Color @(checker == activeChecker ? "active" : "")" @onclick="()=> { CheckerPieceClicked(checker); }">
+                            <div class="center">@(checker.Diretion == CheckerDirection.Both ? "♕" : "")</div>
+                        </div>
+                    }
+                    @if (isPossibleMove)
+                    {
+                        <div class="center target-move">🎯</div>
+                    }
+                </div>
+            }
+        </div>
+    }
+
+}
+else
+{
+    <GameOverScreen IsPlayerVictorius="@IsPlayerWinner()" />
 }
 
 @code {
@@ -162,12 +171,12 @@
         Console.WriteLine("Possible moves");
         foreach (var item in movePossibilities)
         {
-            
+
             Console.WriteLine($"Possibility: row={item.row} col={item.column}");
         }
         bool isPossibleMove = movePossibilities.Contains((row, column));
         Console.WriteLine("IsPossibleMove = " + isPossibleMove);
-        
+
         if (!isPossibleMove) return;
 
         CheckForCheckerTaken(row, column);
@@ -176,7 +185,7 @@
         HubConnection.SendAsync(SharedConstants.MULTIPLAYER_HUB_METHOD_MOVE_CHECKER, GameId, activeChecker.Column, activeChecker.Row, column, row);
         activeChecker.Column = column;
         activeChecker.Row = row;
-        
+
         if((activeChecker.Row == 0 && activeChecker.Color == Constants.WHITE_CHECKER_COLOR_NAME) || 
         (activeChecker.Row == (Constants.BOARD_SIZE - 1) && activeChecker.Color == Constants.BLACK_CHECKER_COLOR_NAME))
         {
@@ -213,9 +222,19 @@
                     Console.WriteLine(whiteChecker.Row + "  | " + whiteChecker.Column);
                 }
                 if (takenChecker != null) whiteCheckers.Remove(takenChecker);
-                
+
             }
         }
+    }
+
+    protected bool IsGameOver()
+    {
+        return blackCheckers.Count <= 0 || whiteCheckers.Count <= 0;
+    }
+
+    protected bool IsPlayerWinner()
+    {
+        return (IsWhitePlayer && blackCheckers.Count <= 0) || (!IsWhitePlayer && whiteCheckers.Count <= 0);
     }
 
     protected void ChangeTurn()

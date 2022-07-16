@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32526.322
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OnlineCheckers.Server", "Server\OnlineCheckers.Server.csproj", "{28637F2A-5192-4859-80C4-7BC576BD7991}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OnlineCheckers.Server", "Server\OnlineCheckers.Server.csproj", "{28637F2A-5192-4859-80C4-7BC576BD7991}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OnlineCheckers.Client", "Client\OnlineCheckers.Client.csproj", "{DE1B6DF7-D542-4C0B-AF85-38A5567F88EE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OnlineCheckers.Client", "Client\OnlineCheckers.Client.csproj", "{DE1B6DF7-D542-4C0B-AF85-38A5567F88EE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OnlineCheckers.Shared", "Shared\OnlineCheckers.Shared.csproj", "{E569E3DD-9903-4822-8064-EE7FCD3767A8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OnlineCheckers.Shared", "Shared\OnlineCheckers.Shared.csproj", "{E569E3DD-9903-4822-8064-EE7FCD3767A8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
