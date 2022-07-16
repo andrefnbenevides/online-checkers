@@ -44,11 +44,20 @@
     align-items: center;
 }
 
-.checker.active {
-    border: 3px solid #c7c840;
+    .checker.active {
+        /*border: 3px solid #c7c840;*/
+        -webkit-box-shadow: 0 0 20px #2e05b9;
+        -moz-box-shadow: 0 0 20px #2e05b9;
+        box-shadow: 0 0 20px #2e05b9;
+    }
+
+.center {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    font-size: 40px;
 }
 
-.cell.active{
-    border: 3px solid #10d137;
-
+.target-move {
+    color: green;
 }
