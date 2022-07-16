@@ -1,4 +1,7 @@
 ﻿@using OnlineCheckers.Client.Data
+<div>
+    @(isWhiteTurn? "Whites' turn" : "Blacks' turn")
+</div>
 @for (int i = 0; i < Constants.BOARD_SIZE; i++)
 {
     int auxI = i;
@@ -40,6 +43,11 @@
 
     protected void CheckerPieceClicked(Checker checker)
     {
+        if (isWhiteTurn && checker.Color == Constants.BLACK_CHECKER_COLOR_NAME)
+            return;
+        if (!isWhiteTurn && checker.Color == Constants.WHITE_CHECKER_COLOR_NAME)
+            return;
+
         SetActiveChecker(checker); 
         GeneratePossibleMoves();    
     }
@@ -82,7 +90,7 @@
         var whiteChecker = blackCheckers.FirstOrDefault(n => n.Row == row && n.Column == column);
 
         return whiteChecker == null && blackChecker == null;
-        
+
     }
 
     protected void ClearPossibilities()
@@ -105,6 +113,12 @@
         activeChecker = null;
 
         ClearPossibilities();
+        ChangeTurn();
+    }
+
+    protected void ChangeTurn()
+    {
+        isWhiteTurn = !isWhiteTurn;
     }
 
     protected void GeneratePieces()
