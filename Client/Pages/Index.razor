@@ -9,20 +9,24 @@
 }
 else
 {
-    <button @onclick="CreateGame">Create Game</button>
-
-    @foreach (string gameId in availableGames)
+    if (queued)
     {
-        <button @onclick="() => { JoinGame(gameId); }">Join game @gameId</button>
+        <h2>Waiting for a worthy opponent...</h2>
+    }
+    else
+    {
+        <button @onclick="CreateGame">Create Game</button>
     }
 }
 
 @code{
     private HubConnection? hubConnection;
-    List<string> availableGames = new List<string>();
     bool inGame = false;
+    bool queued = false;
     string gameId = "";
     bool isWhitePlayer = true;
+
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -30,32 +34,20 @@ else
             .WithUrl(NavigationManager.ToAbsoluteUri(SharedConstants.MULTIPLAYER_HUB_PATTERN_CONNECT).ToString())
             .Build();
 
-        await FetchAvailableGames();
-    }
-
-    async Task FetchAvailableGames()
-    {
-        HttpClient client = new HttpClient();
-        availableGames = await client.GetFromJsonAsync<List<string>>(NavigationManager.ToAbsoluteUri(SharedConstants.API_ENDPOINT_GET_AVAILABLE_GAMES).ToString());
-        if (availableGames == null) availableGames = new List<string>();
+        hubConnection.On(SharedConstants.MULTIPLAYER_HUB_GAME_STARTED, (Game args) =>
+        {
+            Console.WriteLine("Found an opponent and now game is starting");
+            isWhitePlayer = hubConnection.ConnectionId == args.WhitePlayerId;
+            gameId = args.GameId;
+            inGame = true;
+            StateHasChanged();
+        });
     }
 
     async Task CreateGame()
     {
-
         await hubConnection.StartAsync();
-        gameId = Guid.NewGuid().ToString();
-        await hubConnection.SendAsync(SharedConstants.MULTIPLAYER_HUB_METHOD_JOIN_GAME, gameId);
-        inGame = true;
-    }
-
-    async Task JoinGame(string gameId)
-    {
-        isWhitePlayer = false;
-        await hubConnection.StartAsync();
-        this.gameId = gameId;
-        await hubConnection.SendAsync(SharedConstants.MULTIPLAYER_HUB_METHOD_JOIN_GAME, gameId);
-
-        inGame = true;
+        await hubConnection.SendAsync(SharedConstants.MULTIPLAYER_HUB_METHOD_JOIN_GAME);
+        queued = true;
     }
 }

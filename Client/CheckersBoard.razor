@@ -68,24 +68,9 @@ else
 
     protected void OpponentMove(int prevCol, int prevRow, int currCol, int currRow)
     {
-        Console.WriteLine("Black checkers");
-        foreach (var item in blackCheckers)
-        {
-
-            Console.WriteLine($"Black row={item.Row} col={item.Column}");
-        }
-
-        Console.WriteLine("White checkers");
-        foreach (var item in whiteCheckers)
-        {
-
-            Console.WriteLine($"White row={item.Row} col={item.Column}");
-        }
         var checker = blackCheckers.FirstOrDefault(n => n.Column == prevCol && n.Row == prevRow);
         if(checker == null) checker = whiteCheckers.FirstOrDefault(n => n.Column == prevCol && n.Row == prevRow);
 
-        Console.WriteLine($"Opponent moved his checker from c:{prevCol} r:{prevRow} to c:{currCol} r:{currRow}");
-        Console.WriteLine($"Checker is {(checker == null ? "" : "NOT")} NULL");
         SetActiveChecker(checker);
         GeneratePossibleMoves();
         MoveChecker(currRow, currCol);
