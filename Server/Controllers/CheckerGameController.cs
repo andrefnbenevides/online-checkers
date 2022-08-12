@@ -14,11 +14,5 @@ namespace OnlineCheckers.Server.Controllers
         {
             _gameManager = gameManager;
         }
-
-        [HttpGet("GetAvailableGames")]
-        public IEnumerable<string> GetAvailableGames()
-        {
-            return _gameManager.GetAvailableGames();
-        }
     }
 }

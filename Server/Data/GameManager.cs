@@ -1,32 +1,35 @@
-﻿namespace OnlineCheckers.Server.Data
+﻿using OnlineCheckers.Shared;
+
+namespace OnlineCheckers.Server.Data
 {
     public class GameManager
     {
-        private Dictionary<string, int> Games = new();
+        private List<Game> Games = new();
 
-        public void AddGame(string gameId)
+        public void AddGame(Game game)
         {
-            Games.Add(gameId, 1);
+            Games.Add(game);
         }
 
-        public void IncrementGamePlayerCount(string gameId)
-        {
-            Games[gameId]++;
-        }
+        //public void IncrementGamePlayerCount(string gameId)
+        //{
+        //    Games[gameId]++;
+        //}
 
-        public bool GameExists(string gameId)
-        {
-            return Games.ContainsKey(gameId);
-        }
+        //public bool GameExists(string gameId)
+        //{
+        //    return Games.ContainsKey(gameId);
+        //}
 
-        public bool CanJoinGame(string gameId)
-        {
-            return GameExists(gameId) && Games[gameId] < 2;
-        }
+        //public bool CanJoinGame(string gameId)
+        //{
+        //    return GameExists(gameId) && Games[gameId] < 2;
+        //}
 
-        public IEnumerable<string> GetAvailableGames()
+        public IEnumerable<Game> GetAvailableGames()
         {
-            return Games.Where(n => n.Value < 2).Select(n => n.Key);
+            return Games.Where(n => n.PlayerCounter < 2);
         }
     }
+
 }

@@ -17,5 +17,7 @@ namespace OnlineCheckers.Shared
         public const string MULTIPLAYER_HUB_CHECKER_MOVED = "CheckerMoved";
 
         public const string API_ENDPOINT_GET_AVAILABLE_GAMES = "/api/GetAvailableGames";
+
+        public static string MULTIPLAYER_HUB_GAME_STARTED = "GameStarted";
     }
 }
