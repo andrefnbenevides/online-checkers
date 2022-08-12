@@ -11,20 +11,17 @@ namespace OnlineCheckers.Server.Data
             Games.Add(game);
         }
 
-        //public void IncrementGamePlayerCount(string gameId)
-        //{
-        //    Games[gameId]++;
-        //}
+        public Game? GetGameByPlayerId(string connectionId)
+        {
+            Game? game = Games.FirstOrDefault(s => s.BlackPlayerId == connectionId || s.WhitePlayerId == connectionId);
 
-        //public bool GameExists(string gameId)
-        //{
-        //    return Games.ContainsKey(gameId);
-        //}
+            return game;
+        }
 
-        //public bool CanJoinGame(string gameId)
-        //{
-        //    return GameExists(gameId) && Games[gameId] < 2;
-        //}
+        public void RemoveGame(Game game)
+        {
+            Games.Remove(game);
+        }
 
         public IEnumerable<Game> GetAvailableGames()
         {
