@@ -64,6 +64,7 @@ else
         });
 
         HubConnection.On<int, int, int, int>(SharedConstants.MULTIPLAYER_HUB_CHECKER_MOVED, OpponentMove);
+        HubConnection.On<string>(SharedConstants.MULTIPLAYER_HUB_PLAYER_DISCONNECTED, EndGame);
     }
 
     protected void OpponentMove(int prevCol, int prevRow, int currCol, int currRow)
@@ -76,13 +77,26 @@ else
         MoveChecker(currRow, currCol);
     }
 
+    protected void EndGame(string checkerColor)
+    {
+        if(checkerColor == SharedConstants.WHITE_CHECKER_COLOR_NAME)
+        {
+            whiteCheckers.Clear();
+        }
+        else
+        {
+            blackCheckers.Clear();
+        }
+        StateHasChanged();
+    }
+
     protected void CheckerPieceClicked(Checker checker)
     {
         if (isWhiteTurn != IsWhitePlayer) 
             return;
-        if (isWhiteTurn && checker.Color == Constants.BLACK_CHECKER_COLOR_NAME)
+        if (isWhiteTurn && checker.Color == SharedConstants.BLACK_CHECKER_COLOR_NAME)
             return;
-        if (!isWhiteTurn && checker.Color == Constants.WHITE_CHECKER_COLOR_NAME)
+        if (!isWhiteTurn && checker.Color == SharedConstants.WHITE_CHECKER_COLOR_NAME)
             return;
 
         SetActiveChecker(checker); 
@@ -171,8 +185,8 @@ else
         activeChecker.Column = column;
         activeChecker.Row = row;
 
-        if((activeChecker.Row == 0 && activeChecker.Color == Constants.WHITE_CHECKER_COLOR_NAME) || 
-        (activeChecker.Row == (Constants.BOARD_SIZE - 1) && activeChecker.Color == Constants.BLACK_CHECKER_COLOR_NAME))
+        if((activeChecker.Row == 0 && activeChecker.Color == SharedConstants.WHITE_CHECKER_COLOR_NAME) || 
+        (activeChecker.Row == (Constants.BOARD_SIZE - 1) && activeChecker.Color == SharedConstants.BLACK_CHECKER_COLOR_NAME))
         {
             activeChecker.Diretion = CheckerDirection.Both;
             Console.WriteLine("Changed direction to both");
@@ -238,7 +252,7 @@ else
                         Column = j,
                         Row = i,
                         Diretion = CheckerDirection.Down,
-                        Color = Constants.BLACK_CHECKER_COLOR_NAME
+                        Color = SharedConstants.BLACK_CHECKER_COLOR_NAME
                     });
             }
         }
@@ -252,7 +266,7 @@ else
                         Column = j,
                         Row = i,
                         Diretion = CheckerDirection.Up,
-                        Color = Constants.WHITE_CHECKER_COLOR_NAME
+                        Color = SharedConstants.WHITE_CHECKER_COLOR_NAME
                     });
             }
         }
