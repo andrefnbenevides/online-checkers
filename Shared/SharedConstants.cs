@@ -12,10 +12,12 @@ namespace OnlineCheckers.Shared
 
         public const string MULTIPLAYER_HUB_METHOD_JOIN_GAME = "JoinGame";
         public const string MULTIPLAYER_HUB_METHOD_MOVE_CHECKER = "MoveChecker";
+        public const string MULTIPLAYER_HUB_METHOD_TURN_PASSED = "PassTurn";
 
         public const string MULTIPLAYER_HUB_GAME_JOINED = "GameJoined";
         public const string MULTIPLAYER_HUB_CHECKER_MOVED = "CheckerMoved";
-        
+        public const string MULTIPLAYER_HUB_CHECKER_PLAYER_PASSED_TURN = "PlayerPassedTurn";
+
         public const string MULTIPLAYER_HUB_PLAYER_DISCONNECTED = "PlayerDisconnected";
 
         public const string API_ENDPOINT_GET_AVAILABLE_GAMES = "/api/GetAvailableGames";

@@ -26,6 +26,12 @@ namespace OnlineCheckers.Server.Hubs
             return base.OnDisconnectedAsync(exception);
         }
 
+        public async Task PassTurn(string gameId)
+        {
+            await Clients.GroupExcept(gameId, Context.ConnectionId)
+                .SendAsync(SharedConstants.MULTIPLAYER_HUB_CHECKER_PLAYER_PASSED_TURN);
+        }
+
         public async Task JoinGame()
         {
             List<Game> availableGames = _gameManager.GetAvailableGames().ToList();
