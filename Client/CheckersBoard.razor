@@ -50,6 +50,7 @@ else
     bool isWhiteTurn = true;
     private static System.Timers.Timer turnTimer;
     int timeLeft = 30;
+    int turnsTimedout = 0;
     List<Checker> blackCheckers = new List<Checker>();
     List<Checker> whiteCheckers = new List<Checker>();
     Checker activeChecker = null;
@@ -69,6 +70,7 @@ else
         HubConnection.On<int, int, int, int>(SharedConstants.MULTIPLAYER_HUB_CHECKER_MOVED, OpponentMove);
         HubConnection.On(SharedConstants.MULTIPLAYER_HUB_CHECKER_PLAYER_PASSED_TURN, TurnPassed);
         HubConnection.On<string>(SharedConstants.MULTIPLAYER_HUB_PLAYER_DISCONNECTED, EndGame);
+        HubConnection.On(SharedConstants.MULTIPLAYER_HUB_CHECKERS_PLAYER_CONCEDED, EnemyConceded);
 
         StartTurnTimer();
     }
@@ -81,6 +83,11 @@ else
         SetActiveChecker(checker);
         GeneratePossibleMoves();
         MoveChecker(currRow, currCol);
+    }
+
+    protected void EnemyConceded()
+    {
+        EndGame(IsWhitePlayer ? SharedConstants.BLACK_CHECKER_COLOR_NAME : SharedConstants.WHITE_CHECKER_COLOR_NAME);
     }
 
     protected void EndGame(string checkerColor)
@@ -193,7 +200,6 @@ else
 
     private void TurnChangePhase()
     {
-        Console.WriteLine("TurnChangePhase fired");
         activeChecker = null;
         ChangeTurn();
         GeneratePossibleMoves();
@@ -240,7 +246,6 @@ else
 
     protected void TurnPassed()
     {
-        Console.WriteLine("Turn has passed...");
         TurnChangePhase();
     }
 
@@ -254,29 +259,43 @@ else
     public void StartTurnTimer()
     {
         if (turnTimer != null) turnTimer.Enabled = false;
-        Console.WriteLine("TurnTimer has stopped");
 
         turnTimer = new System.Timers.Timer(1000);
         turnTimer.Elapsed += CountdownTimer;
         turnTimer.Enabled = true;
-        Console.WriteLine("TurnTimer has started");
     }
 
     public void CountdownTimer(Object source, System.Timers.ElapsedEventArgs e)
     {
         timeLeft -= 1;
-        Console.WriteLine("Countdown fired. timeLeft = " + timeLeft);
         if(timeLeft <= 0)
         {
             if((IsWhitePlayer && isWhiteTurn) || (!IsWhitePlayer && !isWhiteTurn))
             {
-                Console.WriteLine("Sent turn has passed");
-                HubConnection.SendAsync(SharedConstants.MULTIPLAYER_HUB_METHOD_TURN_PASSED, GameId);
-                TurnChangePhase();
+                turnsTimedout += 1;
+                if(turnsTimedout >= Constants.MAX_TIMED_OUT_TURNS)
+                {
+                    Concede();
+                }
+                else
+                {
+                    PassTurn();
+                }
             }
-            turnTimer.Enabled = false;
         }
         StateHasChanged();
+    }
+
+    public void Concede()
+    {
+        HubConnection.SendAsync(SharedConstants.MULTIPLAYER_HUB_METHOD_PLAYER_CONCEDED, GameId);
+        EndGame(IsWhitePlayer ? SharedConstants.WHITE_CHECKER_COLOR_NAME : SharedConstants.BLACK_CHECKER_COLOR_NAME);
+    }
+
+    public void PassTurn()
+    {
+        HubConnection.SendAsync(SharedConstants.MULTIPLAYER_HUB_METHOD_TURN_PASSED, GameId);
+        TurnChangePhase();
     }
 
     protected void GeneratePieces()

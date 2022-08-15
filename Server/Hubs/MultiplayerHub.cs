@@ -32,6 +32,12 @@ namespace OnlineCheckers.Server.Hubs
                 .SendAsync(SharedConstants.MULTIPLAYER_HUB_CHECKER_PLAYER_PASSED_TURN);
         }
 
+        public async Task Concede(string gameId)
+        {
+            await Clients.GroupExcept(gameId, Context.ConnectionId)
+                .SendAsync(SharedConstants.MULTIPLAYER_HUB_CHECKERS_PLAYER_CONCEDED);
+        }
+
         public async Task JoinGame()
         {
             List<Game> availableGames = _gameManager.GetAvailableGames().ToList();
