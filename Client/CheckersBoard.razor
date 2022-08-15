@@ -5,7 +5,7 @@
 @if (!IsGameOver())
 {
     <div>
-        @(isWhiteTurn? "Whites' turn" : "Blacks' turn")
+        @(isWhiteTurn? "Whites' turn" : "Blacks' turn") - Time Left @(timeLeft)s
     </div>
     @for (int i = 0; i < Constants.BOARD_SIZE; i++)
     {
@@ -46,7 +46,10 @@ else
     [Parameter] public HubConnection HubConnection { get; set; }
     [Parameter] public bool IsWhitePlayer{ get; set; }
 
+
     bool isWhiteTurn = true;
+    private static System.Timers.Timer turnTimer;
+    int timeLeft = 30;
     List<Checker> blackCheckers = new List<Checker>();
     List<Checker> whiteCheckers = new List<Checker>();
     Checker activeChecker = null;
@@ -64,7 +67,10 @@ else
         });
 
         HubConnection.On<int, int, int, int>(SharedConstants.MULTIPLAYER_HUB_CHECKER_MOVED, OpponentMove);
+        HubConnection.On(SharedConstants.MULTIPLAYER_HUB_CHECKER_PLAYER_PASSED_TURN, TurnPassed);
         HubConnection.On<string>(SharedConstants.MULTIPLAYER_HUB_PLAYER_DISCONNECTED, EndGame);
+
+        StartTurnTimer();
     }
 
     protected void OpponentMove(int prevCol, int prevRow, int currCol, int currRow)
@@ -166,20 +172,11 @@ else
 
     void MoveChecker(int row, int column)
     {
-        Console.WriteLine($"MoveChecker called. row={row} col={column}");
-        Console.WriteLine("Possible moves");
-        foreach (var item in movePossibilities)
-        {
-
-            Console.WriteLine($"Possibility: row={item.row} col={item.column}");
-        }
         bool isPossibleMove = movePossibilities.Contains((row, column));
-        Console.WriteLine("IsPossibleMove = " + isPossibleMove);
 
         if (!isPossibleMove) return;
 
         CheckForCheckerTaken(row, column);
-        Console.WriteLine("Check for checker taken done.");
 
         HubConnection.SendAsync(SharedConstants.MULTIPLAYER_HUB_METHOD_MOVE_CHECKER, GameId, activeChecker.Column, activeChecker.Row, column, row);
         activeChecker.Column = column;
@@ -189,9 +186,14 @@ else
         (activeChecker.Row == (Constants.BOARD_SIZE - 1) && activeChecker.Color == SharedConstants.BLACK_CHECKER_COLOR_NAME))
         {
             activeChecker.Diretion = CheckerDirection.Both;
-            Console.WriteLine("Changed direction to both");
         }
 
+        TurnChangePhase();
+    }
+
+    private void TurnChangePhase()
+    {
+        Console.WriteLine("TurnChangePhase fired");
         activeChecker = null;
         ChangeTurn();
         GeneratePossibleMoves();
@@ -236,9 +238,45 @@ else
         return (IsWhitePlayer && blackCheckers.Count <= 0) || (!IsWhitePlayer && whiteCheckers.Count <= 0);
     }
 
+    protected void TurnPassed()
+    {
+        Console.WriteLine("Turn has passed...");
+        TurnChangePhase();
+    }
+
     protected void ChangeTurn()
     {
         isWhiteTurn = !isWhiteTurn;
+        timeLeft = 30;
+        StartTurnTimer();
+    }
+
+    public void StartTurnTimer()
+    {
+        if (turnTimer != null) turnTimer.Enabled = false;
+        Console.WriteLine("TurnTimer has stopped");
+
+        turnTimer = new System.Timers.Timer(1000);
+        turnTimer.Elapsed += CountdownTimer;
+        turnTimer.Enabled = true;
+        Console.WriteLine("TurnTimer has started");
+    }
+
+    public void CountdownTimer(Object source, System.Timers.ElapsedEventArgs e)
+    {
+        timeLeft -= 1;
+        Console.WriteLine("Countdown fired. timeLeft = " + timeLeft);
+        if(timeLeft <= 0)
+        {
+            if((IsWhitePlayer && isWhiteTurn) || (!IsWhitePlayer && !isWhiteTurn))
+            {
+                Console.WriteLine("Sent turn has passed");
+                HubConnection.SendAsync(SharedConstants.MULTIPLAYER_HUB_METHOD_TURN_PASSED, GameId);
+                TurnChangePhase();
+            }
+            turnTimer.Enabled = false;
+        }
+        StateHasChanged();
     }
 
     protected void GeneratePieces()
