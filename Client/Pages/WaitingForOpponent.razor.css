@@ -1,0 +1,18 @@
+﻿
+.parent {
+    width: 500px;
+    display: grid;
+}
+
+.logo {
+    width: 400px;
+    margin: auto;
+}
+
+img {
+    width: 400px;
+}
+
+.text {
+    justify-items: center;
+}
