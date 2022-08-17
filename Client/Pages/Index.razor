@@ -3,6 +3,9 @@
 @using Microsoft.AspNetCore.SignalR.Client
 @using OnlineCheckers.Shared
 
+<div class="center">
+    🙾 Online Checkers 🙿
+</div>
 @if (inGame)
 {
     <CheckersBoard HubConnection="@hubConnection" GameId="@gameId" IsWhitePlayer="@isWhitePlayer"/>
@@ -11,11 +14,20 @@ else
 {
     if (queued)
     {
-        <h2>Waiting for a worthy opponent...</h2>
+        <div class="center">
+            <WaitingForOpponent></WaitingForOpponent>
+        </div>
     }
     else
     {
-        <button @onclick="CreateGame">Create Game</button>
+        <div class="center">
+            <div class="content">
+                <img class="checkers-image" src="assets/checkers.png" />
+            </div>
+            <div class="content">
+                <button class="my-button" @onclick="PlayGame">Play Now</button>
+            </div>
+        </div>
     }
 }
 
@@ -44,7 +56,7 @@ else
         });
     }
 
-    async Task CreateGame()
+    async Task PlayGame()
     {
         await hubConnection.StartAsync();
         await hubConnection.SendAsync(SharedConstants.MULTIPLAYER_HUB_METHOD_JOIN_GAME);
