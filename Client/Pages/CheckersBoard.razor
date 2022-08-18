@@ -62,11 +62,6 @@ else
         base.OnInitialized();
         GeneratePieces();
 
-        HubConnection.On(SharedConstants.MULTIPLAYER_HUB_GAME_JOINED, () =>
-        {
-            Console.WriteLine("User has joined the game");
-        });
-
         HubConnection.On<int, int, int, int>(SharedConstants.MULTIPLAYER_HUB_CHECKER_MOVED, OpponentMove);
         HubConnection.On(SharedConstants.MULTIPLAYER_HUB_CHECKER_PLAYER_PASSED_TURN, TurnPassed);
         HubConnection.On<string>(SharedConstants.MULTIPLAYER_HUB_PLAYER_DISCONNECTED, EndGame);
@@ -208,8 +203,6 @@ else
 
     protected void CheckForCheckerTaken(int row, int column)
     {
-        Console.WriteLine("Evaluating if checker was taken");
-
         if(Math.Abs(activeChecker.Column - column) == 2)
         {
             int jumpedColumn = (activeChecker.Column + column) / 2;
@@ -224,12 +217,7 @@ else
             else
             {
                 takenChecker = whiteCheckers.FirstOrDefault(n => n.Column == jumpedColumn && n.Row == jumpedRow);
-                foreach (var whiteChecker in whiteCheckers)
-                {
-                    Console.WriteLine(whiteChecker.Row + "  | " + whiteChecker.Column);
-                }
                 if (takenChecker != null) whiteCheckers.Remove(takenChecker);
-
             }
         }
     }

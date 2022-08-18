@@ -48,14 +48,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        try
-        {
-            playerCount = await OnlineCheckersService.GetPlayerCount();
-        }
-        catch(Exception ex)
-        {
-            Console.WriteLine(ex.ToString());    
-        }
+        playerCount = await OnlineCheckersService.GetPlayerCount();
 
         hubConnection = new HubConnectionBuilder()
             .WithUrl(NavigationManager.ToAbsoluteUri(SharedConstants.MULTIPLAYER_HUB_PATTERN_CONNECT).ToString())
