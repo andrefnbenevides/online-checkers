@@ -2,17 +2,25 @@
 
 @if (IsPlayerVictorius)
 {
-    <div class="center">
-        WINNER WINNER CHECKERS DINNER
+    <div class="center parent">
+        <div class="content logo">
+            <img src="assets/checkers-victory.png" />
+        </div>
     </div>
 }
 else
 {
-    <div class="center">
-        GAME OVER
+    <div class="center parent">
+        <div class="content logo">
+            <img src="assets/checkers-defeat.png" />
+        </div>
     </div>
 }
-<button @onclick="() => { GoBackToLobby(); }">Go back to lobby</button>
+<div class="center">
+    <div class="content">
+        <button class="my-button" @onclick="() => { GoBackToLobby(); }">Go back to lobby</button>
+    </div>
+</div>
 
 @code {
     [Parameter] public bool IsPlayerVictorius { get; set; }
