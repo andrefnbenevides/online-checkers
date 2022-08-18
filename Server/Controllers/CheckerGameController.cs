@@ -14,5 +14,12 @@ namespace OnlineCheckers.Server.Controllers
         {
             _gameManager = gameManager;
         }
+
+        [HttpGet("GetPlayerCount")]
+        public IActionResult GetPlayerCount()
+        {
+            int count = _gameManager.GetPlayerCount();
+            return Ok(count);
+        }
     }
 }

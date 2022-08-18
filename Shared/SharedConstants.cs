@@ -22,7 +22,7 @@ namespace OnlineCheckers.Shared
 
         public const string MULTIPLAYER_HUB_PLAYER_DISCONNECTED = "PlayerDisconnected";
 
-        public const string API_ENDPOINT_GET_AVAILABLE_GAMES = "/api/GetAvailableGames";
+        public const string API_ENDPOINT_GET_PLAYER_COUNT = "/api/GetPlayerCount";
 
         public static string MULTIPLAYER_HUB_GAME_STARTED = "GameStarted";
 
