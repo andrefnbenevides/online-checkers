@@ -1,6 +1,7 @@
 ﻿@page "/"
 @inject NavigationManager NavigationManager
 @using Microsoft.AspNetCore.SignalR.Client
+@using OnlineCheckers.Client.Data
 @using OnlineCheckers.Shared
 
 <div class="center">
@@ -27,28 +28,34 @@ else
             <div class="content">
                 <button class="my-button" @onclick="PlayGame">Play Now</button>
             </div>
+            <div class="content">
+                <h5>Online players: @playerCount</h5>
+            </div>
         </div>
     }
 }
 
 @code{
+    [Inject]
+    public IOnlineCheckersService OnlineCheckersService { get; set; }
     private HubConnection? hubConnection;
     bool inGame = false;
     bool queued = false;
     string gameId = "";
     bool isWhitePlayer = true;
-
+    int playerCount = 0;
 
 
     protected override async Task OnInitializedAsync()
     {
+        playerCount = await OnlineCheckersService.GetPlayerCount();
+
         hubConnection = new HubConnectionBuilder()
             .WithUrl(NavigationManager.ToAbsoluteUri(SharedConstants.MULTIPLAYER_HUB_PATTERN_CONNECT).ToString())
             .Build();
 
         hubConnection.On(SharedConstants.MULTIPLAYER_HUB_GAME_STARTED, (Game args) =>
         {
-            Console.WriteLine("Found an opponent and now game is starting");
             isWhitePlayer = hubConnection.ConnectionId == args.WhitePlayerId;
             gameId = args.GameId;
             inGame = true;

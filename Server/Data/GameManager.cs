@@ -23,6 +23,11 @@ namespace OnlineCheckers.Server.Data
             Games.Remove(game);
         }
 
+        internal int GetPlayerCount()
+        {
+            return Games.Sum(s => s.PlayerCounter);
+        }
+
         public IEnumerable<Game> GetAvailableGames()
         {
             return Games.Where(n => n.PlayerCounter < 2);
