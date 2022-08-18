@@ -4,9 +4,34 @@
     </div>
     <div class="content text">
         <h2>Waiting for a worthy opponent...</h2>
+        <h5>Wait time: @GetWaitTime()</h5>
     </div>
 </div>
 
 @code {
+    private System.Threading.Timer? timer;
+    static int timeInQueue = 0;
 
+    protected override async Task OnInitializedAsync()
+    {
+        // NOTE: THE FOLLOWING CODE ADDED
+        timer = new System.Threading.Timer(async (object? stateInfo) =>
+        {
+            timeInQueue += 1;
+            StateHasChanged(); 
+        }, new System.Threading.AutoResetEvent(false), 1000, 1000); 
+    }
+
+    protected string GetWaitTime()
+    {
+        TimeSpan t = TimeSpan.FromSeconds(timeInQueue);
+        string time = "";
+        time += t.Hours > 0 ? string.Format("{0:D2}h ", t.Hours) : "";
+        time += (t.Hours > 0 || t.Minutes > 0) ? string.Format("{0:D2}m ", t.Minutes) : "";
+        time += string.Format("{0:D2}s", t.Seconds);
+
+        Console.WriteLine("GetWaitTime: " + time);
+
+        return time;
+    }
 }
