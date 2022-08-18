@@ -14,7 +14,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        // NOTE: THE FOLLOWING CODE ADDED
         timer = new System.Threading.Timer(async (object? stateInfo) =>
         {
             timeInQueue += 1;
@@ -29,8 +28,6 @@
         time += t.Hours > 0 ? string.Format("{0:D2}h ", t.Hours) : "";
         time += (t.Hours > 0 || t.Minutes > 0) ? string.Format("{0:D2}m ", t.Minutes) : "";
         time += string.Format("{0:D2}s", t.Seconds);
-
-        Console.WriteLine("GetWaitTime: " + time);
 
         return time;
     }
